@@ -7,6 +7,8 @@ Gamebuino gb;
 typedef struct Joueur {
   int x;
   int y;
+  int vx = 0;
+  int vy = 0;
   char equipe;
 } Joueur;
 
@@ -58,8 +60,8 @@ gb.display.drawLine(LCDWIDTH,LCDHEIGHT - CAGESH,LCDWIDTH - TERRAING,LCDHEIGHT - 
 //Le centre du terrain
 gb.display.drawLine(LCDWIDTH/2,0,LCDWIDTH/2,LCDHEIGHT);
 // Les scores toussa
-gb.display.drawChar(0,LCDHEIGHT-10,'B',10);
-gb.display.drawChar(LCDWIDTH-TERRAING,LCDHEIGHT-10,'W',10);
+gb.display.drawChar(TERRAING/2-2,LCDHEIGHT-12,'B',2);
+gb.display.drawChar(LCDWIDTH-TERRAING/2-2,LCDHEIGHT-12,'W',2);
 }
 
 void balle(){
@@ -105,6 +107,17 @@ void initialiser(){
 }
 
 void collisions(){
-  
+  int d;
+  int col;
+  for (int i=0;i<NJOUEURS;i++)
+  {
+    for (int j=0;j<NJOUEURS;j++){
+      if (j == i) {break;}
+      d = sqrt(sq(Joueurs[i].x - Joueurs[j].x) + sq(Joueurs[i].y - Joueurs[j].y));
+      if (d < (RJOUEUR * 2)) {
+        
+      }
+    }
+  }
 }
 
