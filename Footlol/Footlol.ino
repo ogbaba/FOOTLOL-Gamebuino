@@ -58,8 +58,8 @@ gb.display.drawLine(LCDWIDTH,LCDHEIGHT - CAGESH,LCDWIDTH - TERRAING,LCDHEIGHT - 
 //Le centre du terrain
 gb.display.drawLine(LCDWIDTH/2,0,LCDWIDTH/2,LCDHEIGHT);
 // Les scores toussa
-gb.display.drawChar(0,LCDHEIGHT-gb.display.10,'B',10);
-gb.display.drawChar(0,LCDHEIGHT-gb.display.10,'B',10);
+gb.display.drawChar(0,LCDHEIGHT-10,'B',10);
+gb.display.drawChar(LCDWIDTH-TERRAING,LCDHEIGHT-10,'W',10);
 }
 
 void balle(){
