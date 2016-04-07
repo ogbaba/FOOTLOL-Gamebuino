@@ -2,6 +2,7 @@
 #define CAGESH 14
 #define RBALLE 2
 
+#define LFRICTION 0.5
 #define NJOUEURS 6
 #define RJOUEUR 3
 #define	J1X 84/2-10

@@ -23,7 +23,7 @@ typedef struct Pos {
   int x;
   int y;
 } Pos;
-
+float friction = 0.2;
 float  Nsel = 0;
 float dsel = 0;
 char phase = 's'; //t pour tir (j pour jeu)
@@ -106,6 +106,7 @@ void dJoueurs(){
 }
 
 void initialiser(){
+  phase = 's';
   balle.x = LCDWIDTH/2;
   balle.y = LCDHEIGHT/2;
   Joueurs[0].x = posInitJ[0].x = J1X;
@@ -128,8 +129,8 @@ void initialiser(){
   Joueurs[5].equipe = 'b';
   for (int i = 0; i<NJOUEURS; i++)
   {
-    Joueurs[0].vx = 0;
-    Joueurs[0].vy = 0;
+    Joueurs[i].vx = 0;
+    Joueurs[i].vy = 0;
   }
   balle.vx = 0;
   balle.vy = 0;
@@ -156,6 +157,9 @@ void gPhases()
 
 void phaseTir()
 {
+  phaseJFinie = 1;
+  Nsel = 0;
+  dsel = 0;
   if (quiJoue == 'b')
   {
   if (gb.buttons.pressed(BTN_RIGHT))
@@ -206,17 +210,18 @@ gb.display.println(phase);
 
 void phaseTir2()
 {
+  phaseJFinie = 1;
   gb.display.println(phase);
   float posCx = Joueurs[curseur].x;
   float posCy = Joueurs[curseur].y;
 
    if (gb.buttons.pressed(BTN_RIGHT))
    {
-     Nsel += PI/4;
+     Nsel += PI/8;
    }
      if (gb.buttons.pressed(BTN_LEFT))
     {
-      Nsel -= PI/4;
+      Nsel -= PI/8;
     }
     if (gb.buttons.pressed(BTN_UP))
     {
@@ -237,8 +242,8 @@ void phaseTir2()
     posCx = Joueurs[curseur].x + dsel * cos(Nsel);
     posCy = Joueurs[curseur].y + dsel * sin(Nsel);
     gb.display.drawLine(Joueurs[curseur].x,Joueurs[curseur].y,posCx,posCy);  
-    Joueurs[curseur].vx = (dsel * sin(Nsel)) / 10 ;
-    Joueurs[curseur].vy = (dsel * cos(Nsel)) / 10 ;
+    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 10 ;
+    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 10 ;
     gb.display.println(posCx);
 if (gb.buttons.pressed(BTN_B))
 {
@@ -246,9 +251,11 @@ phase = 'j';
 if (quiJoue == 'w')
 {
   quiJoue = 'b';
+  curseur = 0;
 }
 else {
   quiJoue = 'w';
+  curseur = 3;
 }
   
 }
@@ -262,6 +269,9 @@ phase = 't';
 void initPosJ(int nJoueur){
   Joueurs[nJoueur].x = posInitJ[nJoueur].x;
   Joueurs[nJoueur].y = posInitJ[nJoueur].y;
+  Joueurs[nJoueur].vx = 0;
+    Joueurs[nJoueur].vy = 0;
+
 }
 
 void phaseJeu() {
@@ -271,41 +281,112 @@ void phaseJeu() {
   float Vin, Vinx, Viny, Vjn, Vjnx, Vjny;
   balle.x += balle.vx;
   balle.y += balle.vy;
+
+  // FRICTION JOUEUR
+  if (balle.vx > -LFRICTION )
+  {
+     balle.vx -= friction;
+  }
+    if (balle.vx < LFRICTION)
+  {
+     balle.vx += friction;
+  }
+    if (balle.vy > -LFRICTION)
+  {
+     balle.vy -= friction;
+  }
+    if (balle.vy < LFRICTION)
+  {
+     balle.vy += friction;
+  }
+  //COLLISIONS ENVIRONNEMENT
     if ((balle.x - RJOUEUR < TERRAING)||(balle.x + RJOUEUR > LCDWIDTH - TERRAING))
     {
-      if ((balle.y > CAGESH)||(balle.y < LCDHEIGHT - CAGESH))
+      if (balle.y < CAGESH)
       { 
-        balle.vx *= -1;
+        balle.x += 1;
+      }
+      if (balle.y > LCDHEIGHT - CAGESH)
+      {
+        balle.x -= 1;
       }
       else {
         initialiser();
       }
+     balle.vx *= -1;
+
     }   
-    if ((balle.y > LCDHEIGHT)||(balle.y < 0))
+    if (balle.y > LCDHEIGHT)
     {
-      balle.vy *= -1;
+      balle.y -= -1;
     }
+    if (balle.y < 0)
+    {
+      balle.y += 1;
+    }
+    balle.vy *= -1;
 
   for (int i=0;i<NJOUEURS;i++)
   {  
     if ((Joueurs[i].x - RJOUEUR < TERRAING)||(Joueurs[i].x + RJOUEUR > LCDWIDTH - TERRAING))
     {
-      if ((Joueurs[i].y > CAGESH)||(Joueurs[i].y < LCDHEIGHT - CAGESH))
+      if ((Joueurs[i].y < CAGESH))
       { 
-        Joueurs[i].vx *= -1;
+        Joueurs[i].x += 1;
       }
+      if (Joueurs[i].y > LCDHEIGHT - CAGESH)
+      {
+        Joueurs[i].x -= 1;
+
+      }        
+
       else {
-        initPosJ[i];
+        initPosJ(i);
       }
+      Joueurs[i].vx *= -1;
+
     }
+    if (Joueurs[i].y > LCDHEIGHT)
+    {
+      Joueurs[i].y -= 1;
+    }
+    if (Joueurs[i].y < 0)
+    {
+      Joueurs[i].y += 1;
+    }
+    Joueurs[i].vy *= -1;
+    //FIN COLLISIONS
+    // FRICTION JOUEUR
+      if (Joueurs[i].vx > -LFRICTION )
+  {
+     Joueurs[i].vx -= friction;
+  }
+    if (Joueurs[i].vx < LFRICTION)
+  {
+     Joueurs[i].vx += friction;
+  }
+    if (Joueurs[i].vy > -LFRICTION)
+  {
+     Joueurs[i].vy -= friction;
+  }
+    if (Joueurs[i].vy < LFRICTION)
+  {
+     Joueurs[i].vy += friction;
+  }
+
+//FRICTION fin
+  
     if ((Joueurs[i].y > LCDHEIGHT)||(Joueurs[i].y < 0))
     {
       Joueurs[i].vy *= -1;
     }
-
     Joueurs[i].x += Joueurs[i].vx;
     Joueurs[i].y += Joueurs[i].vy;
-    if ((Joueurs[i].vx + Joueurs[i].vy) != 0)
+    if ((Joueurs[i].vx <= LFRICTION)||(Joueurs[i].vx >=(-LFRICTION)))
+    {
+      phaseJFinie += 1;
+    }
+    if ((Joueurs[i].vy <= LFRICTION)||(Joueurs[i].vy >=(-LFRICTION)))
     {
       phaseJFinie += 1;
     }
@@ -313,10 +394,6 @@ void phaseJeu() {
     {
     //COLLISIONS ENTRE JOUEURS
       if (j == i) {j++;}
-       if ((Joueurs[j].vx + Joueurs[j].vy) != 0)
-        {
-         phaseJFinie += 1;
-        }
       dx = Joueurs[i].x - Joueurs[j].x;
       dy = Joueurs[i].y - Joueurs[j].y;
       if ((dx*dx + dy*dy) < ((RJOUEUR * 2)*(RJOUEUR * 2))) {
@@ -347,10 +424,15 @@ void phaseJeu() {
     //COLLISIONS JOUEURS/BALLE
     dx = Joueurs[i].x - balle.x;
     dy = Joueurs[i].y - balle.y;
-    if ((balle.vx + balle.vy) != 0)
-     {
-     phaseJFinie += 1;
-     }
+    if ((balle.vx <= LFRICTION)||(balle.vx >=(-LFRICTION)))
+    {
+      phaseJFinie += 1;
+    }
+    if ((balle.vy <= LFRICTION)||(balle.vy >=(-LFRICTION)))
+    {
+      phaseJFinie += 1;
+    }
+    
     if ((dx*dx + dy*dy) < ((RJOUEUR + RBALLE)*(RJOUEUR + RBALLE))) {
       int N = atan(dy/dx);
       if(dx < 0){
