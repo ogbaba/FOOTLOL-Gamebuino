@@ -19,13 +19,20 @@ typedef struct Balle {
   float vy = 0;
 } Balle;
 
+typedef struct Pos {
+  int x;
+  int y;
+} Pos;
 char phase = 't'; //t pour tir (j pour jeu)
 int phaseJFinie = 0;
-
+int curseur = 0;
 Balle balle;
 
 Joueur Joueurs[NJOUEURS];
 
+Pos posInitJ[NJOUEURS];
+
+void initPosJ(int nJoueur);
 void phaseTir();
 void dBalle();
 void dJoueurs();
@@ -96,23 +103,23 @@ void dJoueurs(){
 void initialiser(){
   balle.x = LCDWIDTH/2;
   balle.y = LCDHEIGHT/2;
-  Joueurs[0].x = J1X;
-  Joueurs[0].y = J1Y;
+  Joueurs[0].x = posInitJ[0].x = J1X;
+  Joueurs[0].y = posInitJ[0].y = J1Y;
   Joueurs[0].equipe = 'w';
-  Joueurs[1].x = J2X;
-  Joueurs[1].y = J2Y;
+  Joueurs[1].x = posInitJ[1].x = J2X;
+  Joueurs[1].y = posInitJ[1].y = J2Y;
   Joueurs[1].equipe = 'w';
-  Joueurs[2].x = J3X;
-  Joueurs[2].y = J3Y;
+  Joueurs[2].x = posInitJ[2].x = J3X;
+  Joueurs[2].y = posInitJ[2].y = J3Y;
   Joueurs[2].equipe = 'w';
-  Joueurs[3].x = J4X;
-  Joueurs[3].y = J4Y;
+  Joueurs[3].x = posInitJ[3].x = J4X;
+  Joueurs[3].y = posInitJ[3].y = J4Y;
   Joueurs[3].equipe = 'b';
-  Joueurs[4].x = J5X;
-  Joueurs[4].y = J5Y;
+  Joueurs[4].x = posInitJ[4].x = J5X;
+  Joueurs[4].y = posInitJ[4].y = J5Y;
   Joueurs[4].equipe = 'b';
-  Joueurs[5].x = J6X;
-  Joueurs[5].y = J6Y;
+  Joueurs[5].x = posInitJ[5].x = J6X;
+  Joueurs[5].y = posInitJ[5].y = J6Y;
   Joueurs[5].equipe = 'b';
 }
 void gPhases()
@@ -133,7 +140,16 @@ void gPhases()
 
 void phaseTir()
 {
-  
+  if (gb.buttons.pressed(BTN_RIGHT))
+  {
+    
+  }
+}
+
+
+void initPosJ(int nJoueur){
+  Joueurs[nJoueur].x = posInitJ[nJoueur].x;
+  Joueurs[nJoueur].y = posInitJ[nJoueur].y;
 }
 
 void phaseJeu(){
@@ -143,8 +159,38 @@ void phaseJeu(){
   float Vin, Vinx, Viny, Vjn, Vjnx, Vjny;
   balle.x += balle.vx;
   balle.y += balle.vy;
+    if ((balle.x - RJOUEUR < TERRAING)||(balle.x + RJOUEUR > LCDWIDTH - TERRAING))
+    {
+      if ((balle.y > CAGESH)||(balle.y < LCDHEIGHT - CAGESH))
+      { 
+        balle.vx *= -1;
+      }
+      else {
+        initialiser();
+      }
+    }   
+    if ((balle.y > LCDHEIGHT)||(balle.y < 0))
+    {
+      balle.vy *= -1;
+    }
+
   for (int i=0;i<NJOUEURS;i++)
-  {
+  {  
+    if ((Joueurs[i].x - RJOUEUR < TERRAING)||(Joueurs[i].x + RJOUEUR > LCDWIDTH - TERRAING))
+    {
+      if ((Joueurs[i].y > CAGESH)||(Joueurs[i].y < LCDHEIGHT - CAGESH))
+      { 
+        Joueurs[i].vx *= -1;
+      }
+      else {
+        initPosJ[i];
+      }
+    }
+    if ((Joueurs[i].y > LCDHEIGHT)||(Joueurs[i].y < 0))
+    {
+      Joueurs[i].vy *= -1;
+    }
+
     Joueurs[i].x += Joueurs[i].vx;
     Joueurs[i].y += Joueurs[i].vy;
     if ((Joueurs[i].vx + Joueurs[i].vy) != 0)
@@ -153,6 +199,20 @@ void phaseJeu(){
     }
     //COLLISIONS ENTRE JOUEURS
     for (int j=0;j<NJOUEURS;j++){
+    if ((Joueurs[i].x - RJOUEUR < TERRAING)||(Joueurs[i].x + RJOUEUR > LCDWIDTH - TERRAING))
+    {
+      if ((Joueurs[j].y > CAGESH)||(Joueurs[j].y < LCDHEIGHT - CAGESH))
+      { 
+        Joueurs[j].vx *= -1;
+      }
+      else {
+        initPosJ[j];
+      }
+    }   
+    if ((Joueurs[j].y > LCDHEIGHT)||(Joueurs[j].y < 0))
+    {
+      Joueurs[j].vy *= -1;
+    }
       if (j == i) {break;}
        if ((Joueurs[j].vx + Joueurs[j].vy) != 0)
         {
