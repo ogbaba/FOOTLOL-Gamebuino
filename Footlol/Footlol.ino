@@ -129,8 +129,10 @@ void initialiser(){
   for (int i = 0; i<NJOUEURS; i++)
   {
     Joueurs[0].vx = 0;
-    Joueurs[0].vy
+    Joueurs[0].vy = 0;
   }
+  balle.vx = 0;
+  balle.vy = 0;
 }
 void gPhases()
 {
@@ -224,7 +226,7 @@ void phaseTir2()
     {
       dsel -= 1;
     }
-    if (dsel > 10)
+    if (dsel > 20)
     {
       dsel -= 1;
     }
@@ -235,8 +237,8 @@ void phaseTir2()
     posCx = Joueurs[curseur].x + dsel * cos(Nsel);
     posCy = Joueurs[curseur].y + dsel * sin(Nsel);
     gb.display.drawLine(Joueurs[curseur].x,Joueurs[curseur].y,posCx,posCy);  
-    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 10 ;
-    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 10 ;
+    Joueurs[curseur].vx = (dsel * sin(Nsel)) / 10 ;
+    Joueurs[curseur].vy = (dsel * cos(Nsel)) / 10 ;
     gb.display.println(posCx);
 if (gb.buttons.pressed(BTN_B))
 {
