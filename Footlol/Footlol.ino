@@ -7,23 +7,32 @@ Gamebuino gb;
 typedef struct Joueur {
   int x;
   int y;
-  int vx = 0;
-  int vy = 0;
+  float vx = 0;
+  float vy = 0;
   char equipe;
 } Joueur;
 
+typedef struct Balle {
+  int x;
+  int y;
+  float vx = 0;
+  float vy = 0;
+} Balle;
+
+char phase = 't'; //t pour tir (j pour jeu)
+int phaseJFinie = 0;
+
+Balle balle;
+
 Joueur Joueurs[NJOUEURS];
 
-int ballePosX = LCDWIDTH/2;
-int ballePosY = LCDHEIGHT/2;
-
-
-void balle();
+void phaseTir();
+void dBalle();
 void dJoueurs();
-void collisions();
+void phaseJeu();
 void initialiser();
 void dDecor();
-
+void gPhases();
 
 void setup() {
   // put your setup code here, to run once:
@@ -37,8 +46,9 @@ void loop() {
   if(gb.update()){
   // put your main code here, to run repeatedly:
   dDecor();
-  balle();
+  dBalle();
   dJoueurs();
+  phaseJeu();
   if (gb.buttons.pressed(BTN_C)) {
     gb.titleScreen(F("Footlol"));
     initialiser();
@@ -64,8 +74,8 @@ gb.display.drawChar(TERRAING/2-2,LCDHEIGHT-12,'B',2);
 gb.display.drawChar(LCDWIDTH-TERRAING/2-2,LCDHEIGHT-12,'W',2);
 }
 
-void balle(){
-  gb.display.fillCircle(ballePosX,ballePosY,RBALLE);
+void dBalle(){
+  gb.display.fillCircle(balle.x,balle.y,RBALLE);
   
 }
 void dJoueurs(){
@@ -84,8 +94,8 @@ void dJoueurs(){
 }
 
 void initialiser(){
-  ballePosX = LCDWIDTH/2;
-  ballePosY = LCDHEIGHT/2;
+  balle.x = LCDWIDTH/2;
+  balle.y = LCDHEIGHT/2;
   Joueurs[0].x = J1X;
   Joueurs[0].y = J1Y;
   Joueurs[0].equipe = 'w';
@@ -105,19 +115,106 @@ void initialiser(){
   Joueurs[5].y = J6Y;
   Joueurs[5].equipe = 'b';
 }
+void gPhases()
+{
+  if (phaseJFinie == 0)
+  {
+    phase = 't';
+  }
+  if (phase == 'j')
+  {
+    phaseJeu();
+  }
+  if (phase == 't')
+  {
+    phaseTir();
+  }
+}
 
-void collisions(){
+void phaseTir()
+{
+  
+}
+
+void phaseJeu(){
+  phaseJFinie = 0;
   int d;
-  int col;
+  int dx, dy;
+  float Vin, Vinx, Viny, Vjn, Vjnx, Vjny;
+  balle.x += balle.vx;
+  balle.y += balle.vy;
   for (int i=0;i<NJOUEURS;i++)
   {
+    Joueurs[i].x += Joueurs[i].vx;
+    Joueurs[i].y += Joueurs[i].vy;
+    if ((Joueurs[i].vx + Joueurs[i].vy) != 0)
+    {
+      phaseJFinie += 1;
+    }
+    //COLLISIONS ENTRE JOUEURS
     for (int j=0;j<NJOUEURS;j++){
       if (j == i) {break;}
-      d = sqrt(sq(Joueurs[i].x - Joueurs[j].x) + sq(Joueurs[i].y - Joueurs[j].y));
-      if (d < (RJOUEUR * 2)) {
+       if ((Joueurs[j].vx + Joueurs[j].vy) != 0)
+        {
+         phaseJFinie += 1;
+        }
+      dx = Joueurs[i].x - Joueurs[j].x;
+      dy = Joueurs[i].y - Joueurs[j].y;
+      if ((dx*dx + dy*dy) < ((RJOUEUR * 2)*(RJOUEUR * 2))) {
+        int N = atan(dy/dx);
+        if(dx < 0){
+          N += PI;
+        }
+        //JOUEUR I
+        Vin = Joueurs[i].vx * cos(N) + Joueurs[j].vy * sin(N);
+        Vinx = Vin * cos(N);
+        Viny = Vin * sin(N);
+        //JOUEUR  J
+        Vjn = Joueurs[j].vx * cos(N) + Joueurs[j].vy * sin(N);
+        //the composant of Vin on x and y
+        Vjnx = Vjn * cos(N);
+        Vjny = Vjn * sin(N);
+        
+        //JOUEUR I
+        Joueurs[i].vx += - Vinx + Vjnx;
+        Joueurs[i].vy += - Viny + Vjny;
+
+        //JOUEUR J
+        Joueurs[j].vx += - Vjnx + Vinx;
+        Joueurs[j].vy += - Vjny + Viny;
         
       }
     }
+    //COLLISIONS JOUEURS/BALLE
+    dx = Joueurs[i].x - balle.x;
+    dy = Joueurs[i].y - balle.y;
+    if ((balle.vx + balle.vy) != 0)
+     {
+     phaseJFinie += 1;
+     }
+    if ((dx*dx + dy*dy) < ((RJOUEUR + RBALLE)*(RJOUEUR + RBALLE))) {
+      int N = atan(dy/dx);
+      if(dx < 0){
+        N += PI;
+      }
+              //JOUEUR I
+        Vin = Joueurs[i].vx * cos(N) + balle.vy * sin(N);
+        Vinx = Vin * cos(N);
+        Viny = Vin * sin(N);
+        //JOUEUR  J
+        Vjn = balle.vx * cos(N) + balle.vy * sin(N);
+        //the composant of Vin on x and y
+        Vjnx = Vjn * cos(N);
+        Vjny = Vjn * sin(N);
+        
+        //JOUEUR I
+        Joueurs[i].vx += - Vinx + Vjnx;
+        Joueurs[i].vy += - Viny + Vjny;
+
+        //JOUEUR J
+        balle.vx += - Vjnx + Vinx;
+        balle.vy += - Vjny + Viny;
   }
+}
 }
 
