@@ -223,7 +223,7 @@ if (gb.buttons.pressed(BTN_A))
 
 void phaseTir2()
 {
-  gb.display.println(phase);
+  //gb.display.println(phase);
   float posCx = Joueurs[curseur].x;
   float posCy = Joueurs[curseur].y;
 
