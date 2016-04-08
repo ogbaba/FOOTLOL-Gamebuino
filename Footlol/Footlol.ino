@@ -23,12 +23,14 @@ typedef struct Pos {
   int x;
   int y;
 } Pos;
+int ptsB = 0;
+int ptsW = 0;
 int compteur = 0;
 float  Nsel = 0;
 float dsel = 0;
 char phase = 's'; //t pour tir (j pour jeu)
 int phaseJFinie = 1;
-int curseur = 0;
+int curseur = 3;
 char quiJoue = 'w';
 Balle balle;
 
@@ -65,6 +67,7 @@ void loop() {
   if (gb.buttons.pressed(BTN_C)) {
     gb.titleScreen(F("Footlol"));
     initialiser();
+    ptsB = ptsW = 0;
     }
   }
 }
@@ -85,6 +88,15 @@ gb.display.drawLine(LCDWIDTH/2,0,LCDWIDTH/2,LCDHEIGHT);
 // Les scores toussa
 gb.display.drawChar(TERRAING/2-2,LCDHEIGHT-12,'B',2);
 gb.display.drawChar(LCDWIDTH-TERRAING/2-2,LCDHEIGHT-12,'W',2);
+// score B
+gb.display.cursorX = TERRAING/2-4;
+gb.display.cursorY = 4;
+gb.display.print(ptsB);
+// score W
+gb.display.cursorX = LCDWIDTH - TERRAING/2-4;
+gb.display.cursorY = 4;
+gb.display.print(ptsW);
+
 }
 
 void dBalle(){
@@ -205,7 +217,7 @@ if (gb.buttons.pressed(BTN_A))
   phase = 't';  
 
 }
-gb.display.println(phase);
+//gb.display.println(phase);
 }
 
 
@@ -245,7 +257,7 @@ void phaseTir2()
     gb.display.drawLine(Joueurs[curseur].x,Joueurs[curseur].y,posCx,posCy);  
     Joueurs[curseur].vx = (dsel * cos(Nsel)) / 10 ;
     Joueurs[curseur].vy = (dsel * sin(Nsel)) / 10 ;
-    gb.display.println(posCx);
+    //gb.display.println(posCx);
 if (gb.buttons.pressed(BTN_B))
 {
 phase = 'j';
@@ -309,24 +321,27 @@ void phaseJeu() {
   // COLLISION BALLE GAUCHE
     if ((balle.x - RJOUEUR) < TERRAING)
     {
-      if ((balle.y > CAGESH)||(balle.y < LCDHEIGHT - CAGESH))
+      if ((balle.y < CAGESH)||(balle.y > LCDHEIGHT - CAGESH))
       { 
         balle.x += 1;
       }
       else {
         initialiser();
+        ptsW += 1;
+
       }
       balle.vx *= -1;
     }
     //COLLISION BALLE DROITE   
     if ((balle.x + RJOUEUR) > (LCDWIDTH - TERRAING))
     {
-    if ((balle.y > CAGESH)||(balle.y < LCDHEIGHT - CAGESH))
+    if ((balle.y < CAGESH)||(balle.y > LCDHEIGHT - CAGESH))
     { 
       balle.x -= 1;
     }
     else {
       initialiser();
+      ptsB += 1;
     }
       balle.vx *= -1;
     }
@@ -344,7 +359,7 @@ void phaseJeu() {
 
   for (int i=0;i<NJOUEURS;i++)
   {  
-  //FRICTION BALLE
+  //FRICTION JOUEUR
   if (Joueurs[i].vx < -LFRICTION)
   {
     Joueurs[i].vx += FRICTION;
@@ -437,6 +452,9 @@ void phaseJeu() {
         Joueurs[j].vx += - Vjnx + Vinx;
         Joueurs[j].vy += - Vjny + Viny;
         
+        Joueurs[i].x = Joueurs[j].x - cos(N) * (RJOUEUR+RJOUEUR);
+        Joueurs[i].y = Joueurs[j].y - sin(N) * (RJOUEUR+RJOUEUR);
+        
       }
     }
     //COLLISIONS JOUEURS/BALLE
@@ -450,6 +468,10 @@ void phaseJeu() {
       if(dx < 0){
         N += PI;
       }
+      
+  //EVITER LES COINCEMENTS Joueurs Balle:
+      Joueurs[i].x = balle.x - cos(N) * (RJOUEUR+RBALLE);
+      Joueurs[i].y = balle.y - sin(N) * (RJOUEUR+RBALLE);
               //JOUEUR I
         Vin = Joueurs[i].vx * cos(N) + balle.vy * sin(N);
         Vinx = Vin * cos(N);
