@@ -5,16 +5,16 @@
 Gamebuino gb;
 
 typedef struct Joueur {
-  int x;
-  int y;
+  float x;
+  float y;
   float vx = 0;
   float vy = 0;
   char equipe;
 } Joueur;
 
 typedef struct Balle {
-  int x;
-  int y;
+  float x;
+  float y;
   float vx = 0;
   float vy = 0;
 } Balle;
@@ -23,7 +23,7 @@ typedef struct Pos {
   int x;
   int y;
 } Pos;
-
+int compteur = 0;
 float  Nsel = 0;
 float dsel = 0;
 char phase = 's'; //t pour tir (j pour jeu)
@@ -36,6 +36,7 @@ Joueur Joueurs[NJOUEURS];
 
 Pos posInitJ[NJOUEURS];
 
+void resetV();
 void initPosJ(int nJoueur);
 void phaseTir();
 void dBalle();
@@ -128,8 +129,8 @@ void initialiser(){
   Joueurs[5].equipe = 'b';
   for (int i = 0; i<NJOUEURS; i++)
   {
-    Joueurs[0].vx = 0;
-    Joueurs[0].vy = 0;
+    Joueurs[i].vx = 0;
+    Joueurs[i].vy = 0;
   }
   balle.vx = 0;
   balle.vy = 0;  
@@ -138,7 +139,7 @@ void initialiser(){
 }
 void gPhases()
 {
-  if (phaseJFinie == 0)
+  if ((phaseJFinie == 0)&&(compteur > 40))
   {
     phase = 's';
   }
@@ -158,6 +159,7 @@ void gPhases()
 
 void phaseTir()
 {
+  compteur = 0;
   if (quiJoue == 'b')
   {
   if (gb.buttons.pressed(BTN_RIGHT))
@@ -215,11 +217,11 @@ void phaseTir2()
 
    if (gb.buttons.pressed(BTN_RIGHT))
    {
-     Nsel += PI/4;
+     Nsel += PI/16;
    }
      if (gb.buttons.pressed(BTN_LEFT))
     {
-      Nsel -= PI/4;
+      Nsel -= PI/16;
     }
     if (gb.buttons.pressed(BTN_UP))
     {
@@ -233,15 +235,15 @@ void phaseTir2()
     {
       dsel -= 1;
     }
-    if (dsel < 0)
+    if (dsel < 5)
     {
       dsel += 1;
     }
     posCx = Joueurs[curseur].x + dsel * cos(Nsel);
     posCy = Joueurs[curseur].y + dsel * sin(Nsel);
     gb.display.drawLine(Joueurs[curseur].x,Joueurs[curseur].y,posCx,posCy);  
-    Joueurs[curseur].vx = (dsel * sin(Nsel)) / 10 ;
-    Joueurs[curseur].vy = (dsel * cos(Nsel)) / 10 ;
+    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 10 ;
+    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 10 ;
     gb.display.println(posCx);
 if (gb.buttons.pressed(BTN_B))
 {
@@ -249,9 +251,11 @@ phase = 'j';
 if (quiJoue == 'w')
 {
   quiJoue = 'b';
+  curseur = 0;
 }
 else {
   quiJoue = 'w';
+  curseur = 3;
 }
   
 }
@@ -268,6 +272,7 @@ void initPosJ(int nJoueur){
 }
 
 void phaseJeu() {
+  compteur += 1;
   phaseJFinie = 0;
   int d = 0;
   int dx = 0;
@@ -280,20 +285,24 @@ void phaseJeu() {
   if (balle.vx < -LFRICTION)
   {
     balle.vx += FRICTION;
+         phaseJFinie += 1;
   }
   if (balle.vx > LFRICTION)
   {
         balle.vx -= FRICTION;
+         phaseJFinie += 1;
 
   }
   if (balle.vy < -LFRICTION)
   {
         balle.vy += FRICTION;
+         phaseJFinie += 1;
 
   }
   if (balle.vy > LFRICTION)
   {
         balle.y -= FRICTION;
+         phaseJFinie += 1;
 
   }
   // COLLISION BALLE GAUCHE
@@ -338,20 +347,24 @@ void phaseJeu() {
   if (Joueurs[i].vx < -LFRICTION)
   {
     Joueurs[i].vx += FRICTION;
+         phaseJFinie += 1;
   }
   if (Joueurs[i].vx > LFRICTION)
   {
         Joueurs[i].vx -= FRICTION;
+         phaseJFinie += 1;
 
   }
   if (Joueurs[i].vy < -LFRICTION)
   {
         Joueurs[i].vy += FRICTION;
+         phaseJFinie += 1;
 
   }
   if (Joueurs[i].vy > LFRICTION)
   {
         Joueurs[i].y -= FRICTION;
+         phaseJFinie += 1;
 
   }
     //COLLISION JOUEURS GAUCHE
@@ -390,21 +403,17 @@ void phaseJeu() {
     }
     Joueurs[i].x += Joueurs[i].vx;
     Joueurs[i].y += Joueurs[i].vy;
-    if ((Joueurs[i].vx + Joueurs[i].vy) != 0)
-    {
-      phaseJFinie += 1;
-    }
+  
     for (int j=0; j<NJOUEURS;j++)
     {
     //COLLISIONS ENTRE JOUEURS
       if (j == i) {j++;}
-       if ((Joueurs[j].vx + Joueurs[j].vy) != 0)
-        {
-         phaseJFinie += 1;
-        }
+
       dx = Joueurs[i].x - Joueurs[j].x;
       dy = Joueurs[i].y - Joueurs[j].y;
       if ((dx*dx + dy*dy) < ((RJOUEUR * 2)*(RJOUEUR * 2))) {
+        
+         phaseJFinie += 1;
         int N = atan(dy/dx);
         if(dx < 0){
           N += PI;
@@ -432,11 +441,10 @@ void phaseJeu() {
     //COLLISIONS JOUEURS/BALLE
     dx = Joueurs[i].x - balle.x;
     dy = Joueurs[i].y - balle.y;
-    if ((balle.vx + balle.vy) != 0)
-     {
-     phaseJFinie += 1;
-     }
+
     if ((dx*dx + dy*dy) < ((RJOUEUR + RBALLE)*(RJOUEUR + RBALLE))) {
+      
+      phaseJFinie += 1;
       int N = atan(dy/dx);
       if(dx < 0){
         N += PI;
@@ -460,5 +468,14 @@ void phaseJeu() {
         balle.vy += - Vjny + Viny;
   }
 }
+}
+void resetV()
+{
+  for (int i=0 ; i<NJOUEURS; i++)
+  {
+    Joueurs[i].vx = Joueurs[i].vy = 0;
+  }
+      balle.vx = balle.vy = 0;
+
 }
 
