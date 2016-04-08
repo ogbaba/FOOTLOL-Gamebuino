@@ -139,8 +139,9 @@ void initialiser(){
 }
 void gPhases()
 {
-  if ((phaseJFinie == 0)&&(compteur > 40))
+  if ((phaseJFinie == 0)&&(compteur > 60))
   {
+    resetV();
     phase = 's';
   }
   if (phase == 'j')
