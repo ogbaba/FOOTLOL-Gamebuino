@@ -228,19 +228,19 @@ void phaseTir2()
   float posCy = Joueurs[curseur].y;
 
 
-   if (gb.buttons.pressed(BTN_RIGHT))
+   if (gb.buttons.repeat(BTN_RIGHT,1))
    {
-     Nsel += PI/16;
+     Nsel += PI/32;
    }
-     if (gb.buttons.pressed(BTN_LEFT))
+     if (gb.buttons.repeat(BTN_LEFT,1))
     {
-      Nsel -= PI/16;
+      Nsel -= PI/32;
     }
-    if (gb.buttons.pressed(BTN_UP))
+    if (gb.buttons.repeat(BTN_UP,1))
     {
       dsel += 1;
     }
-    if (gb.buttons.pressed(BTN_DOWN))
+    if (gb.buttons.repeat(BTN_DOWN,1))
     {
       dsel -= 1;
     }
@@ -287,9 +287,9 @@ void initPosJ(int nJoueur){
 void phaseJeu() {
   compteur += 1;
   phaseJFinie = 0;
-  int d = 0;
-  int dx = 0;
-  int dy = 0;
+  float d = 0;
+  float dx = 0;
+  float dy = 0;
   float Vin, Vinx, Viny, Vjn, Vjnx, Vjny;
   Vin = Vinx = Viny = Vjn = Vjnx = Vjny = 0;
   balle.x += balle.vx;
@@ -424,13 +424,14 @@ void phaseJeu() {
     {
     //COLLISIONS ENTRE JOUEURS
       if (j == i) {j++;}
+      if (j >= NJOUEURS) {break;}
 
       dx = Joueurs[i].x - Joueurs[j].x;
       dy = Joueurs[i].y - Joueurs[j].y;
       if ((dx*dx + dy*dy) < ((RJOUEUR * 2)*(RJOUEUR * 2))) {
         
          phaseJFinie += 1;
-        int N = atan(dy/dx);
+        float N = atan(dy/dx);
         if(dx < 0){
           N += PI;
         }
@@ -451,9 +452,12 @@ void phaseJeu() {
         //JOUEUR J
         Joueurs[j].vx += - Vjnx + Vinx;
         Joueurs[j].vy += - Vjny + Viny;
+        // eviter coincements
         
-        Joueurs[i].x = Joueurs[j].x - cos(N) * (RJOUEUR+RJOUEUR);
-        Joueurs[i].y = Joueurs[j].y - sin(N) * (RJOUEUR+RJOUEUR);
+        Joueurs[i].x = Joueurs[j].x + cos(N) * (RJOUEUR+RJOUEUR);
+        Joueurs[i].y = Joueurs[j].y + sin(N) * (RJOUEUR+RJOUEUR) ;
+        
+        
         
       }
     }
@@ -464,14 +468,11 @@ void phaseJeu() {
     if ((dx*dx + dy*dy) < ((RJOUEUR + RBALLE)*(RJOUEUR + RBALLE))) {
       
       phaseJFinie += 1;
-      int N = atan(dy/dx);
+      float N = atan(dy/dx);
       if(dx < 0){
         N += PI;
       }
       
-  //EVITER LES COINCEMENTS Joueurs Balle:
-      Joueurs[i].x = balle.x - cos(N) * (RJOUEUR+RBALLE);
-      Joueurs[i].y = balle.y - sin(N) * (RJOUEUR+RBALLE);
               //JOUEUR I
         Vin = Joueurs[i].vx * cos(N) + balle.vy * sin(N);
         Vinx = Vin * cos(N);
@@ -489,6 +490,11 @@ void phaseJeu() {
         //BALLE
         balle.vx += - Vjnx + Vinx;
         balle.vy += - Vjny + Viny;
+        
+  //EVITER LES COINCEMENTS Joueurs Balle:
+      Joueurs[i].x = balle.x + cos(N) * (RJOUEUR+RBALLE);
+      Joueurs[i].y = balle.y + sin(N) * (RJOUEUR+RBALLE);
+        
   }
 }
 }
