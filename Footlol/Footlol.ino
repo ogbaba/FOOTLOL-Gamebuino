@@ -53,7 +53,7 @@ void setup() {
   // put your setup code here, to run once:
   gb.begin();
   initialiser();
-  gb.titleScreen(F("Footlol"));
+  gb.titleScreen(F("Footuino"));
 
 }
 
@@ -66,7 +66,7 @@ void loop() {
   gPhases();
   if (gb.buttons.pressed(BTN_C)) {
     gb.sound.playCancel();
-    gb.titleScreen(F("Footlol"));
+    gb.titleScreen(F("Footuino"));
     initialiser();
     ptsB = ptsW = 0;
     }
