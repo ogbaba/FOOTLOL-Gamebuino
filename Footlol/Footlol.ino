@@ -65,6 +65,7 @@ void loop() {
   dJoueurs();
   gPhases();
   if (gb.buttons.pressed(BTN_C)) {
+    gb.sound.playCancel();
     gb.titleScreen(F("Footlol"));
     initialiser();
     ptsB = ptsW = 0;
@@ -182,6 +183,8 @@ void phaseTir()
     {
       curseur = 0;
     }
+    gb.sound.playTick(); 
+
   }  
   if (gb.buttons.pressed(BTN_LEFT))
   {
@@ -189,7 +192,8 @@ void phaseTir()
     if (curseur < 0)
     {
       curseur = 2;
-    }
+    } 
+    gb.sound.playTick(); 
   }
 }
   if (quiJoue == 'w')
@@ -201,6 +205,8 @@ void phaseTir()
     {
       curseur = 3;
     }
+        gb.sound.playTick(); 
+
   }  
   if (gb.buttons.pressed(BTN_LEFT))
   {
@@ -209,6 +215,8 @@ void phaseTir()
     {
       curseur = 5;
     }
+        gb.sound.playTick(); 
+
   }
 }
 gb.display.drawCircle(Joueurs[curseur].x,Joueurs[curseur].y,RJOUEUR + 1);
@@ -230,11 +238,11 @@ void phaseTir2()
 
    if (gb.buttons.repeat(BTN_RIGHT,1))
    {
-     Nsel += PI/32;
+     Nsel += PI/64;
    }
      if (gb.buttons.repeat(BTN_LEFT,1))
     {
-      Nsel -= PI/32;
+      Nsel -= PI/64;
     }
     if (gb.buttons.repeat(BTN_UP,1))
     {
@@ -255,8 +263,8 @@ void phaseTir2()
     posCx = Joueurs[curseur].x + dsel * cos(Nsel);
     posCy = Joueurs[curseur].y + dsel * sin(Nsel);
     gb.display.drawLine(Joueurs[curseur].x,Joueurs[curseur].y,posCx,posCy);  
-    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 8 ;
-    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 8 ;
+    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 6 ;
+    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 6 ;
     //gb.display.println(posCx);
 if (gb.buttons.pressed(BTN_B))
 {
@@ -270,6 +278,7 @@ else {
   quiJoue = 'w';
   curseur = 3;
 }
+Nsel += PI;
   
 }
 if (gb.buttons.pressed(BTN_A))
@@ -328,6 +337,8 @@ void phaseJeu() {
       else {
         initialiser();
         ptsW += 1;
+        gb.sound.playOK() ;
+
 
       }
       balle.vx *= -1;
@@ -342,6 +353,7 @@ void phaseJeu() {
     else {
       initialiser();
       ptsB += 1;
+      gb.sound.playOK() ;
     }
       balle.vx *= -1;
     }
