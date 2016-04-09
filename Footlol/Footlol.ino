@@ -304,18 +304,14 @@ void phaseJeu() {
   balle.x += balle.vx;
   balle.y += balle.vy;
  // FRICTION BALLE
-  if ((balle.vx < -LFRICTION) || (balle.vx > LFRICTION))
+  if ((balle.vx < -LFRICTION) || (balle.vx > LFRICTION)||(balle.vy < -LFRICTION)||(balle.vy > LFRICTION))
   {
+         phaseJFinie += 1;
+  }
+
     balle.vx *= FRICTION;
-         phaseJFinie += 1;
-  }
+    balle.vy *= FRICTION;
 
-  if ((balle.vy < -LFRICTION)||(balle.vy > LFRICTION))
-  {
-        balle.vy *= FRICTION;
-         phaseJFinie += 1;
-
-  }
 
   // COLLISION BALLE GAUCHE
     if ((balle.x - RBALLE) < TERRAING)
@@ -362,18 +358,14 @@ void phaseJeu() {
   for (int i=0;i<NJOUEURS;i++)
   {  
   //FRICTION JOUEUR
- if ((Joueurs[i].vx < -LFRICTION)||(Joueurs[i].vx > LFRICTION))
+ if ((Joueurs[i].vx < -LFRICTION)||(Joueurs[i].vx > LFRICTION)||(Joueurs[i].vy < -LFRICTION)||(Joueurs[i].vy > LFRICTION))
   {
+
+         phaseJFinie += 1;
+  }
     Joueurs[i].vx *= FRICTION;
-         phaseJFinie += 1;
-  }
+    Joueurs[i].vy *= FRICTION;
 
-  if ((Joueurs[i].vy < -LFRICTION)||(Joueurs[i].vy > LFRICTION))
-  {
-        Joueurs[i].vy *= FRICTION;
-         phaseJFinie += 1;
-
-  }
 
     //COLLISION JOUEURS GAUCHE
     if ((Joueurs[i].x - RJOUEUR) < TERRAING)
@@ -422,7 +414,6 @@ void phaseJeu() {
       dy = Joueurs[i].y - Joueurs[j].y;
       if ((dx*dx + dy*dy) < ((RJOUEUR * 2)*(RJOUEUR * 2))) {
         
-         phaseJFinie += 1;
         float N = atan(dy/dx);
         if(dx < 0){
           N += PI;
@@ -459,7 +450,6 @@ void phaseJeu() {
 
     if ((dx*dx + dy*dy) < ((RJOUEUR + RBALLE)*(RJOUEUR + RBALLE))) {
       
-      phaseJFinie += 1;
       float N = atan(dy/dx);
       if(dx < 0){
         N += PI;

@@ -1,8 +1,8 @@
 #define TERRAING 12
 #define CAGESH 14
 #define RBALLE 2
-#define FRICTION 0.9
-#define LFRICTION 0.5
+#define FRICTION 0.95
+#define LFRICTION 0.8
 #define NJOUEURS 6
 #define RJOUEUR 3
 #define	J1X 84/2-10
