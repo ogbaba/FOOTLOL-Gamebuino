@@ -255,8 +255,8 @@ void phaseTir2()
     posCx = Joueurs[curseur].x + dsel * cos(Nsel);
     posCy = Joueurs[curseur].y + dsel * sin(Nsel);
     gb.display.drawLine(Joueurs[curseur].x,Joueurs[curseur].y,posCx,posCy);  
-    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 10 ;
-    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 10 ;
+    Joueurs[curseur].vx = (dsel * cos(Nsel)) / 8 ;
+    Joueurs[curseur].vy = (dsel * sin(Nsel)) / 8 ;
     //gb.display.println(posCx);
 if (gb.buttons.pressed(BTN_B))
 {
@@ -319,7 +319,7 @@ void phaseJeu() {
 
   }
   // COLLISION BALLE GAUCHE
-    if ((balle.x - RJOUEUR) < TERRAING)
+    if ((balle.x - RBALLE) < TERRAING)
     {
       if ((balle.y < CAGESH)||(balle.y > LCDHEIGHT - CAGESH))
       { 
@@ -333,7 +333,7 @@ void phaseJeu() {
       balle.vx *= -1;
     }
     //COLLISION BALLE DROITE   
-    if ((balle.x + RJOUEUR) > (LCDWIDTH - TERRAING))
+    if ((balle.x + RBALLE) > (LCDWIDTH - TERRAING))
     {
     if ((balle.y < CAGESH)||(balle.y > LCDHEIGHT - CAGESH))
     { 
@@ -407,12 +407,12 @@ void phaseJeu() {
         initPosJ[i];
       }
     }
-    if (Joueurs[i].y > LCDHEIGHT)
+    if (Joueurs[i].y + RJOUEUR > LCDHEIGHT)
     {
       Joueurs[i].y -= 1;
       Joueurs[i].vy *= -1;
     }
-    if (Joueurs[i].y < 0)
+    if (Joueurs[i].y - RJOUEUR < 0)
     {
       Joueurs[i].y += 1;
       Joueurs[i].vy *= -1;
