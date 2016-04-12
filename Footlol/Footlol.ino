@@ -26,7 +26,7 @@ typedef struct Pos {
 int ptsB = 0;
 int ptsW = 0;
 int compteur = 0;
-float  Nsel = 0;
+float  Nsel = PI;
 float dsel = 0;
 char phase = 's'; //t pour tir (j pour jeu)
 int phaseJFinie = 1;
@@ -146,8 +146,14 @@ void initialiser(){
     Joueurs[i].vy = 0;
   }
   balle.vx = 0;
-  balle.vy = 0;  
+  balle.vy = 0;
+  if (quiJoue == 'w')
+  {
+  Nsel = PI;
+  }
+  else {
   Nsel = 0;
+  }
   dsel = 6;
 }
 void gPhases()
